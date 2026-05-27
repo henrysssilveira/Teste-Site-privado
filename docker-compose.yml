@@ -1,7 +1,4 @@
 services:
   web:
     build: .
-    container_name: site-restrito
-    ports:
-      - "80:80"
     restart: unless-stopped
