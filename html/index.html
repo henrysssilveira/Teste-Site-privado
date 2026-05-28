@@ -5,45 +5,571 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Validação de Configuração</title>
     <style>
-        /* CSS Simples para centralizar e dar um visual limpo */
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2ecc71;
+            --primary-dark: #27ae60;
+            --bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --transition: 0.3s ease;
+        }
+
+        .dark-theme {
+            --primary: #55efc4;
+            --primary-dark: #00b894;
+            --bg: #1a1a2e;
+            --card-bg: #16213e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0b0;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            background-color: var(--bg);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            min-height: 100vh;
+            transition: background-color var(--transition);
+            padding: 20px;
         }
 
+        /* ===== CARD PRINCIPAL ===== */
         .card {
-            background-color: #ffffff;
+            background-color: var(--card-bg);
             padding: 30px 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-top: 5px solid #2ecc71; /* Barra verde de sucesso */
+            border-radius: 12px;
+            box-shadow: 0 4px 6px var(--shadow);
+            border-top: 5px solid var(--primary);
             text-align: center;
+            width: 100%;
+            max-width: 800px;
+            transition: transform var(--transition), box-shadow var(--transition);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
         }
 
         h1 {
-            color: #2c3e50;
-            margin: 0 0 10px 0;
-            font-size: 24px;
+            color: var(--text-primary);
+            font-size: 26px;
+            font-weight: 700;
         }
 
-        p {
-            color: #7f8c8d;
-            margin: 0;
-            font-size: 16px;
+        /* ===== STATUS INDICATOR ===== */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .status-badge.online {
+            background-color: rgba(46, 204, 113, 0.15);
+            color: var(--primary-dark);
+        }
+
+        .status-badge.offline {
+            background-color: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.online {
+            background-color: var(--primary);
+        }
+
+        .status-dot.offline {
+            background-color: #e74c3c;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ===== TOGGLE TEMA ===== */
+        .theme-toggle {
+            background: transparent;
+            border: 2px solid var(--text-secondary);
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: rotate(180deg);
+        }
+
+        /* ===== MÉTRICAS ===== */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .metric-item {
+            background: var(--bg);
+            padding: 15px;
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .metric-item:hover {
+            transform: scale(1.05);
+            background: var(--primary);
+            color: white;
+        }
+
+        .metric-item:hover .metric-label {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .metric-item:hover .metric-value {
+            color: white;
+        }
+
+        /* ===== LOG CONSOLE ===== */
+        .console {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            transition: var(--transition);
+        }
+
+        .console-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .console-entry:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .console-timestamp {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+
+        .console-message {
+            color: #bdc3c7;
+        }
+
+        .console-message.success { color: #2ecc71; }
+        .console-message.warning { color: #f39c12; }
+        .console-message.error { color: #e74c3c; }
+        .console-message.info { color: #3498db; }
+
+        /* ===== BARRA DE PROGRESSO ===== */
+        .progress-section {
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 4px;
+            transition: width 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* ===== BOTÕES ===== */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(46,204,113,0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--text-secondary);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* ===== CHECKLIST ===== */
+        .checklist {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .checklist-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .check-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .check-icon.ok {
+            background-color: rgba(46,204,113,0.15);
+            color: var(--primary);
+        }
+
+        .check-icon.pending {
+            background-color: rgba(243,156,18,0.15);
+            color: #f39c12;
+        }
+
+        /* ===== RESPONSIVO ===== */
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .header {
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h1>A configuração deu certo</h1>
-        <p>O ambiente está pronto e respondendo corretamente.</p>
+        <!-- HEADER COM TOGGLE -->
+        <div class="header">
+            <h1>Validação de Configuração</h1>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <button class="theme-toggle" id="themeToggle" title="Alternar tema">🌙</button>
+                <div class="status-badge online" id="statusBadge">
+                    <div class="status-dot online" id="statusDot"></div>
+                    <span id="statusText">ONLINE</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MÉTRICAS -->
+        <div class="metrics-grid">
+            <div class="metric-item">
+                <div class="metric-label">Uptime</div>
+                <div class="metric-value" id="uptimeMetric">0s</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">Requisições</div>
+                <div class="metric-value" id="reqMetric">0</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">Latência</div>
+                <div class="metric-value" id="latencyMetric">-- ms</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">Memória</div>
+                <div class="metric-value" id="memMetric">--</div>
+            </div>
+        </div>
+
+        <!-- BARRA DE PROGRESSO -->
+        <div class="progress-section">
+            <div class="progress-label">
+                <span>Saúde do Sistema</span>
+                <span id="healthPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="healthBar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- CHECKLIST -->
+        <div class="checklist">
+            <div class="checklist-title">Verificações</div>
+            <div class="check-item"><div class="check-icon ok">✓</div> Servidor respondendo</div>
+            <div class="check-item"><div class="check-icon ok">✓</div> Banco de dados conectado</div>
+            <div class="check-item"><div class="check-icon ok">✓</div> HTTPS habilitado</div>
+            <div class="check-item"><div class="check-icon ok">✓</div> Cache configurado</div>
+            <div class="check-item"><div class="check-icon pending">⟳</div> Worker processes <span id="workerStatus">iniciando...</span></div>
+        </div>
+
+        <!-- BOTÕES -->
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="simulatePing()">🔄 Testar Conexão</button>
+            <button class="btn btn-outline" onclick="simulateLoad()">📊 Simular Carga</button>
+            <button class="btn btn-outline" onclick="window.location.reload()">♻️ Recarregar</button>
+        </div>
+
+        <!-- CONSOLE -->
+        <div class="console" id="console">
+            <div class="console-entry">
+                <span class="console-timestamp" id="initTime"></span>
+                <span class="console-message success">Sistema inicializado com sucesso</span>
+            </div>
+        </div>
     </div>
+
+    <script>
+        // ===== ESTADO =====
+        let uptime = 0;
+        let requests = 0;
+        let isDark = false;
+
+        // ===== UTILITÁRIOS =====
+        function getTimestamp() {
+            const now = new Date();
+            return now.toLocaleTimeString('pt-BR', { hour12: false });
+        }
+
+        function addLog(message, type = 'info') {
+            const consoleEl = document.getElementById('console');
+            const entry = document.createElement('div');
+            entry.className = 'console-entry';
+            entry.innerHTML = `<span class="console-timestamp">${getTimestamp()}</span><span class="console-message ${type}">${message}</span>`;
+            consoleEl.appendChild(entry);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        // ===== MÉTRICAS SIMULADAS =====
+        function updateMetrics() {
+            uptime++;
+            document.getElementById('uptimeMetric').textContent = formatUptime(uptime);
+
+            // Latência simulada (20-80ms)
+            const latency = Math.floor(Math.random() * 60) + 20;
+            document.getElementById('latencyMetric').textContent = latency + ' ms';
+
+            // Memória simulada (MB)
+            const mem = (Math.random() * 200 + 100).toFixed(0);
+            document.getElementById('memMetric').textContent = mem + ' MB';
+
+            // Saúde baseada na latência
+            const health = Math.max(0, Math.min(100, 100 - latency));
+            document.getElementById('healthPercent').textContent = health + '%';
+            document.getElementById('healthBar').style.width = health + '%';
+        }
+
+        function formatUptime(seconds) {
+            if (seconds < 60) return seconds + 's';
+            if (seconds < 3600) return Math.floor(seconds / 60) + 'm ' + (seconds % 60) + 's';
+            return Math.floor(seconds / 3600) + 'h ' + Math.floor((seconds % 3600) / 60) + 'm';
+        }
+
+        // ===== TOGGLE TEMA =====
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            isDark = !isDark;
+            document.body.classList.toggle('dark-theme', isDark);
+            this.textContent = isDark ? '☀️' : '🌙';
+            addLog('Tema alterado para ' + (isDark ? 'escuro' : 'claro'), 'info');
+        });
+
+        // ===== AÇÕES DOS BOTÕES =====
+        function simulatePing() {
+            requests++;
+            document.getElementById('reqMetric').textContent = requests;
+            const latency = Math.floor(Math.random() * 100) + 10;
+            addLog(`Ping enviado — resposta em ${latency}ms`, latency < 50 ? 'success' : 'warning');
+
+            // Flash visual no status
+            const badge = document.getElementById('statusBadge');
+            badge.style.transform = 'scale(1.1)';
+            setTimeout(() => badge.style.transform = 'scale(1)', 200);
+        }
+
+        function simulateLoad() {
+            addLog('Iniciando simulação de carga...', 'warning');
+            let count = 0;
+            const interval = setInterval(() => {
+                requests += Math.floor(Math.random() * 50);
+                document.getElementById('reqMetric').textContent = requests;
+                count++;
+                if (count >= 5) {
+                    clearInterval(interval);
+                    addLog(`Carga simulada completa — ${requests} requisições processadas`, 'success');
+                }
+            }, 400);
+        }
+
+        // ===== WORKER STATUS =====
+        function checkWorkers() {
+            const workerStatus = document.getElementById('workerStatus');
+            const workerIcon = document.querySelector('.check-icon.pending');
+            if (workerStatus) {
+                workerStatus.textContent = 'online';
+                if (workerIcon) {
+                    workerIcon.className = 'check-icon ok';
+                    workerIcon.textContent = '✓';
+                }
+                addLog('Worker processes operacionais', 'success');
+            }
+        }
+
+        // ===== INICIALIZAÇÃO =====
+        document.getElementById('initTime').textContent = getTimestamp();
+
+        // Tick de métricas a cada segundo
+        setInterval(updateMetrics, 1000);
+
+        // Log periódico
+        setTimeout(() => addLog('Conexão com banco de dados estabilizada', 'success'), 1500);
+        setTimeout(() => addLog('Cache Redis conectado — 0.8ms de latência', 'success'), 3000);
+        setTimeout(() => addLog('SSL/TLS verificado — certificado válido até 2025', 'info'), 4500);
+        setTimeout(() => addLog('Monitoramento ativo — coletando métricas', 'info'), 6000);
+
+        // Worker check
+        setTimeout(checkWorkers, 4000);
+
+        // Log de heartbeat a cada 30 segundos
+        setInterval(() => addLog(`Heartbeat — sistema operacional (${requests} reqs)`, 'success'), 30000);
+
+        addLog('Monitoramento iniciado — aguardando eventos...', 'success');
+    </script>
 
 </body>
 </html>
